@@ -1,104 +1,33 @@
 function fish_prompt
-	
-    # - green lines if the last return command is OK, red otherwise
-    # - your user name, in red if root or yellow otherwise
-    # - your hostname, in cyan if ssh or blue otherwise
-    # - the current path (with prompt_pwd)
-    # - date +%X
-    # - the current virtual environment, if any
-    # - the current git status, if any, with __fish_git_prompt
-    # - the current battery state, if any, and if your power cable is unplugged, and if you have "acpi"
-    # - current background jobs, if any
+	# Store the exit code of the last command
+	set -g sf_exit_code $status
+	set -g SPACEFISH_VERSION 2.6.0
 
-    # It goes from:
-    # ┬─[nim@Hattori:~]─[11:39:00]
-    # ╰─>$ echo here
+	# ------------------------------------------------------------------------------
+	# Configuration
+	# ------------------------------------------------------------------------------
 
-    # To:
-    # ┬─[nim@Hattori:~/w/dashboard]─[11:37:14]─[V:django20]─[G:master↑1|●1✚1…1]─[B:85%, 05:41:42 remaining]
-    # │ 2	15054	0%	arrêtée	sleep 100000
-    # │ 1	15048	0%	arrêtée	sleep 100000
-    # ╰─>$ echo there
+	__sf_util_set_default SPACEFISH_PROMPT_ADD_NEWLINE true
+	__sf_util_set_default SPACEFISH_PROMPT_FIRST_PREFIX_SHOW false
+	__sf_util_set_default SPACEFISH_PROMPT_PREFIXES_SHOW true
+	__sf_util_set_default SPACEFISH_PROMPT_SUFFIXES_SHOW true
+	__sf_util_set_default SPACEFISH_PROMPT_DEFAULT_PREFIX "via "
+	__sf_util_set_default SPACEFISH_PROMPT_DEFAULT_SUFFIX " "
+	__sf_util_set_default SPACEFISH_PROMPT_ORDER time user dir host git package node ruby golang php rust haskell julia elixir docker aws venv conda pyenv dotnet kubecontext exec_time line_sep battery vi_mode jobs exit_code char
 
-    set -q __fish_git_prompt_showupstream
-    or set -g __fish_git_prompt_showupstream auto
+	# ------------------------------------------------------------------------------
+	# Sections
+	# ------------------------------------------------------------------------------
 
-    function _nim_prompt_wrapper
-        set retc $argv[1]
-        set field_name $argv[2]
-        set field_value $argv[3]
+	# Keep track of whether the prompt has already been opened
+	set -g sf_prompt_opened $SPACEFISH_PROMPT_FIRST_PREFIX_SHOW
 
-        set_color normal
-        set_color $retc
-        echo -n '─'
-        set_color -o green
-        echo -n '['
-        set_color normal
-        test -n $field_name
-        and echo -n $field_name:
-        set_color $retc
-        echo -n $field_value
-        set_color -o green
-        echo -n ']'
-    end
-    and set retc green
-    or set retc red
+	if test "$SPACEFISH_PROMPT_ADD_NEWLINE" = "true"
+		echo
+	end
 
-    set_color $retc
-    echo -n '┬─'
-    set_color -o green
-    echo -n [
-    if test "$USER" = root -o "$USER" = toor
-        set_color -o red
-    else
-        set_color -o yellow
-    end
-    echo -n $USER
-    set_color -o white
-    echo -n @
-    if [ -z "$SSH_CLIENT" ]
-        set_color -o blue
-    else
-        set_color -o cyan
-    end
-    echo -n (prompt_hostname)
-    set_color -o white
-    echo -n :(prompt_pwd)
-    set_color -o green
-    echo -n ']'
-
-    # Date
-    _nim_prompt_wrapper $retc '' (date +%X)
-
-    # Virtual Environment
-    set -q VIRTUAL_ENV
-    and _nim_prompt_wrapper $retc V (basename "$VIRTUAL_ENV")
-
-    # git
-    set prompt_git (__fish_git_prompt | string trim -c ' ()')
-    test -n "$prompt_git"
-    and _nim_prompt_wrapper $retc G $prompt_git
-
-    # Battery status
-    type -q acpi
-    and test (acpi -a 2> /dev/null | string match -r off)
-    and _nim_prompt_wrapper $retc B (acpi -b | cut -d' ' -f 4-)
-
-    # New line
-    echo
-
-    # Background jobs
-    set_color normal
-    for job in (jobs)
-        set_color $retc
-        echo -n '│ '
-        set_color brown
-        echo $job
-    end
-    set_color normal
-    set_color $retc
-    echo -n '╰─>'
-    set_color -o red
-    echo -n '$ '
-    set_color normal
+	for i in $SPACEFISH_PROMPT_ORDER
+		eval __sf_section_$i
+	end
+	set_color normal
 end
