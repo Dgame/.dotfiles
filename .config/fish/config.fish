@@ -1,5 +1,8 @@
 alias dotfiles 'git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
+export PATH="$PATH:/$HOME/.config/composer/vendor/bin/"
+#ssh-add
+
 function _current_branch
   echo (command git symbolic-ref HEAD ^/dev/null | sed -e 's|^refs/heads/||')
 end
