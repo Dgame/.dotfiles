@@ -7,12 +7,15 @@ function _current_branch
   echo (command git symbolic-ref HEAD ^/dev/null | sed -e 's|^refs/heads/||')
 end
 
+alias e 'thunar'
+alias bipro-doc 'php -S 0.0.0.0:8010 -t /home/dgame/Dokumente/Bipro/bipro-release-paket-2.7.1-20180919-1517/model/htmlReport/Datenmodell/'
 alias g 'git'
 alias ga 'git add'
 alias gaa 'git add --all'
 alias gapa 'git add --patch'
 
 alias gb 'git branch'
+alias gbp "git for-each-ref --sort=committerdate refs/heads/ --format='%(color: red)%(committerdate:short) %(color: cyan)%(refname:short)'"
 alias gba 'git branch -a'
 alias gbl 'git blame -b -w'
 alias gbnm 'git branch --no-merged'
