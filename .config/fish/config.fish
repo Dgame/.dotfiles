@@ -1,4 +1,4 @@
-alias dotfiles 'git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dotfiles 'git --git-dir=$HOME/.dotfiles.git/ --work-tree=$HOME'
 
 export PATH="$PATH:/$HOME/.config/composer/vendor/bin/"
 #ssh-add
